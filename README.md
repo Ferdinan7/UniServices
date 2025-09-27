@@ -85,13 +85,6 @@ pnpm --filter NOMBRE_SERVICIO add DEPENDENCIA
 pnpm --filter NOMBRE_SERVICIO add -D DEPENDENCIA
 ```
 
-## 🤝 Contribución
-
-1. Crear una branch desde `main`
-2. Hacer tus cambios
-3. Asegurarse de que todos los servicios compilen: `pnpm turbo run build`
-4. Crear Pull Request
-
 ## 📋 Requisitos
 
 - Node.js 18+
