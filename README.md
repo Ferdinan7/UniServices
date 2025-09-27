@@ -15,7 +15,14 @@ Monorepo para todos los servicios de UniServices usando Turborepo + pnpm workspa
    pnpm install
    ```
 
-3. **Ejecutar todos los servicios en modo desarrollo:**
+3. **Configuración de variables de entorno:**
+   Los archivos `.env` ya están incluidos en el repositorio para facilitar el setup:
+   - `services/Auth-back-service/.env` - Configuración de Supabase y puerto 3000
+   - `services/tramites-back/.env` - Configuración de Supabase y puerto 3550
+   
+   **⚠️ Nota:** Para producción, asegúrate de usar tus propias credenciales.
+
+4. **Ejecutar todos los servicios en modo desarrollo:**
    ```bash
    pnpm turbo run dev
    ```
@@ -67,11 +74,35 @@ pnpm --filter uniauth dev
 
 ## 🔧 Tecnologías
 
-- **🏗️ Monorepo:** Turborepo + pnpm workspaces
+- **🏧 Monorepo:** Turborepo + pnpm workspaces
 - **🎨 Frontend:** Svelte + Vite + TailwindCSS
 - **🚀 Backend:** NestJS + TypeScript
 - **📊 GraphQL:** Apollo Server
 - **🔧 Components:** Stencil.js
+
+## ⚙️ Variables de Entorno
+
+Los archivos `.env` están incluidos en el repositorio para facilitar el desarrollo:
+
+### 🔐 Auth Service (`services/Auth-back-service/.env`)
+```bash
+PORT=3000
+SUPABASE_URL=https://sirtkdkbqsklncyoallp.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+### 📄 Tramites Service (`services/tramites-back/.env`)
+```bash
+PORT=3550
+FRONTEND_URL=http://localhost:5173
+SUPABASE_URL=https://sirtkdkbqsklncyoallp.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+> **🚨 Importante:** Estas credenciales son para desarrollo. En producción:
+> 1. Crea tu propio proyecto Supabase
+> 2. Actualiza las variables con tus credenciales
+> 3. NO subas credenciales de producción al repositorio
 
 ## 📝 Desarrollo
 
