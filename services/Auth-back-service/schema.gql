@@ -1,0 +1,17 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Query {
+  validateToken(token: String!): String!
+  getUserInfo: String!
+  me: String!
+}
+
+type Mutation {
+  signUp(email: String!, password: String!): String!
+  signIn(email: String!, password: String!): String!
+  signInComplete(email: String!, password: String!): String!
+  refreshToken(refresh_token: String!): String!
+  logout: String!
+}
