@@ -26,7 +26,8 @@
       accessToken = tokenFromUrl || tokenFromStorage;
 
       if (!accessToken) {
-        // Sin token: mantener loader y redirigir a la UI de autenticación
+        // Sin token: mostrar loader por un tiempo antes de redirigir
+        await new Promise(resolve => setTimeout(resolve, 2000)); // 2 segundos de delay
         const authServiceUrl = buildAuthUrl(AUTH_CONFIG.ENDPOINTS.LOGIN, window.location.origin);
         window.location.href = authServiceUrl;
         return;
