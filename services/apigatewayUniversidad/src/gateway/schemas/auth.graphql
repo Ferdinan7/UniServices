@@ -1,0 +1,32 @@
+type Query {
+  validateToken(token: String!): String!
+  getUserInfo(token: String!): String!
+  userProfile: String!
+  adminUserProfile(userId: String!): String!
+  studentProfile: String!
+}
+
+type Mutation {
+  signIn(email: String!, password: String!): String!
+  signInComplete(email: String!, password: String!): String!
+  refreshToken(refresh_token: String!): String!
+  logout(token: String!): String!
+}
+
+type User {
+  id: String!
+  email: String!
+  role: String!
+  email_confirmed_at: String
+  app_metadata: String
+  user_metadata: String
+}
+
+type AuthResult {
+  access_token: String!
+  refresh_token: String
+  expires_at: Int!
+  expires_in: Int!
+  token_type: String!
+  user: User!
+}
