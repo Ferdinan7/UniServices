@@ -3,14 +3,14 @@ export const AUTH_CONFIG = {
   // UI de autenticación con Stencil
   AUTH_UI_URL: 'http://localhost:3333',
 
-  // Backend NestJS con GraphQL
-  BACKEND_URL: 'http://localhost:3000',
+  // Backend API Gateway
+  BACKEND_URL: 'http://localhost:4000',
 
-  // Endpoints del servicio de autenticación
+  // Endpoints del servicio de autenticación a través del API Gateway
   ENDPOINTS: {
     LOGIN: '/', // La UI de Stencil probablemente esté en la raíz
     LOGOUT: '/logout',
-    VERIFY_TOKEN: '/graphql' // Endpoint de GraphQL para verificar token
+    VERIFY_TOKEN: '/api/v1/auth/validate' // Endpoint REST del API Gateway
   },
 
   // Parámetros de redirección

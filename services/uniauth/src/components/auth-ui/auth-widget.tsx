@@ -133,29 +133,6 @@ export class AuthWidget {
     }
   }
 
-  // Método de utilidad para logout
-  private async logout() {
-    try {
-      // Limpiar localStorage
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('user_info');
-
-      // Si usas Supabase, también cerrar sesión allí
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabase = createClient(
-        'https://sirtkdkbqsklncyoallp.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpcnRrZGticXNrbG5jeW9hbGxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3Njg3NDMsImV4cCI6MjA3NDM0NDc0M30.B4EHoGBWHaW5RDPT0YbqVVrpwJ4EsWsKBt6yVbwQXAA'
-      );
-
-      await supabase.auth.signOut();
-
-      this.message = 'Logged out successfully';
-    } catch (err) {
-      this.error = 'Error during logout';
-    }
-  }
-
   render() {
     const imageSrc = getAssetPath(`./assets/${this.image}`);
 

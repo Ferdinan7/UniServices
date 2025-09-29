@@ -1,90 +1,58 @@
 <!-- src/routes/+page.svelte -->
 <script lang="ts">
   import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
-  import { page } from "$app/stores";
   import TramiteCard from "$lib/components/TramiteCard.svelte";
   import { getTramites } from "$lib/api/api";
   import { AUTH_CONFIG, buildAuthUrl, buildBackendUrl } from "$lib/config/auth";
-  import { extractAccessTokenFromUrl, cleanUrlFromAuthParams, hasAuthParamsInUrl } from "$lib/utils/tokenExtractor";
-  import { checkAuthServiceHealth, checkLoginEndpoint } from "$lib/utils/healthCheck";
+  import { extractAccessTokenFromUrl, cleanUrlFromAuthParams } from "$lib/utils/tokenExtractor";
 
   let tramitesGrouped: { category: string; tramites: any[] }[] = [];
   let loading = true;
   let error: string | null = null;
   let accessToken: string | null = null;
   let isAuthenticated = false;
-  let debugInfo = '';
 
   onMount(async () => {
     let tokenFromUrl: string | null = null;
 
     try {
-      // Debug: Mostrar información de la URL actual
-      debugInfo = `URL actual: ${window.location.href}`;
-      console.log('Debug - URL actual:', window.location.href);
-      console.log('Debug - Search params:', window.location.search);
-      console.log('Debug - Hash:', window.location.hash);
-
       // Extraer token de la URL (query params o fragmento)
       tokenFromUrl = extractAccessTokenFromUrl();
-      console.log('Debug - Token de URL:', tokenFromUrl ? `Encontrado: ${tokenFromUrl.substring(0, 50)}...` : 'No encontrado');
 
       // Verificar si hay token en localStorage (de sesiones anteriores)
       const tokenFromStorage = localStorage.getItem('access_token');
-      console.log('Debug - Token de localStorage:', tokenFromStorage ? 'Encontrado' : 'No encontrado');
 
       // Usar el token de la URL o del localStorage
       accessToken = tokenFromUrl || tokenFromStorage;
-      console.log('Debug - Token final:', accessToken ? 'Disponible' : 'No disponible');
 
       if (!accessToken) {
-        // Verificar si el servicio de auth está disponible antes de redirigir
-        console.log('Debug - Verificando salud del servicio de auth...');
-        const healthCheck = await checkLoginEndpoint(AUTH_CONFIG.AUTH_UI_URL);
-
-        if (!healthCheck.isAvailable) {
-          error = `Servicio de autenticación no disponible: ${healthCheck.error}`;
-          debugInfo += `\nError del servicio: ${healthCheck.error}`;
-          loading = false;
-          return;
-        }
-
-        // Si no hay token, redirigir al microservicio de auth
+        // Sin token: mantener loader y redirigir a la UI de autenticación
         const authServiceUrl = buildAuthUrl(AUTH_CONFIG.ENDPOINTS.LOGIN, window.location.origin);
-        console.log('Debug - Redirigiendo a:', authServiceUrl);
-        debugInfo += `\nRedirigiendo a: ${authServiceUrl}`;
         window.location.href = authServiceUrl;
         return;
       }
 
-      // Guardar el token en localStorage si viene de la URL
+      // Guardar el token en localStorage si viene de la URL y limpiar la URL
       if (tokenFromUrl) {
         localStorage.setItem('access_token', tokenFromUrl);
-        // Limpiar la URL removiendo todos los parámetros de autenticación
         cleanUrlFromAuthParams();
       }
 
       // Verificar que el token sea válido
-      console.log('Debug - Verificando token...');
       const isValid = await verifyToken(accessToken);
-      console.log('Debug - Token válido:', isValid);
 
       if (!isValid) {
-        console.log('Debug - Token inválido, redirigiendo al login...');
         localStorage.removeItem('access_token');
         const authServiceUrl = buildAuthUrl(AUTH_CONFIG.ENDPOINTS.LOGIN, window.location.origin);
-        console.log('Debug - URL de redirección:', authServiceUrl);
         window.location.href = authServiceUrl;
         return;
       }
 
       isAuthenticated = true;
 
-      // Cargar los trámites
-      tramitesGrouped = await getTramites();
+      // Cargar los trámites con el token de autenticación
+      tramitesGrouped = await getTramites(accessToken);
     } catch (err: any) {
-      console.error('Error en onMount:', err);
       error = `Error de inicialización: ${err}`;
     } finally {
       loading = false;
@@ -93,53 +61,29 @@
 
   async function verifyToken(token: string): Promise<boolean> {
     try {
-      console.log('Debug - Verificando token con GraphQL...');
-      console.log('Debug - URL de verificación:', buildBackendUrl(AUTH_CONFIG.ENDPOINTS.VERIFY_TOKEN));
-
       // TEMPORAL: Simular verificación exitosa si el token tiene el formato JWT
       if (token && token.includes('.')) {
-        console.log('Debug - Token parece ser JWT válido, simulando verificación exitosa');
         return true;
       }
 
-      // Verificar el token con tu backend GraphQL
+      // Verificar el token con el API Gateway usando REST
       const response = await fetch(buildBackendUrl(AUTH_CONFIG.ENDPOINTS.VERIFY_TOKEN), {
-        method: 'POST',
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `
-            query {
-              me {
-                id
-                email
-              }
-            }
-          `
-        })
+        }
       });
 
-      console.log('Debug - Respuesta del servidor:', response.status, response.statusText);
-
-      const result = await response.json();
-      console.log('Debug - Resultado de la query:', result);
-
-      const isValid = response.ok && !result.errors;
-      console.log('Debug - Token válido:', isValid);
-
-      if (!isValid) {
-        console.log('Debug - Errores en la respuesta:', result.errors);
+      if (response.ok) {
+        await response.json();
+        return true;
+      } else {
+        return false;
       }
-
-      return isValid;
-    } catch (error) {
-      console.error('Debug - Error en verificación de token:', error);
-
-      // TEMPORAL: Si hay error de conexión, simular verificación exitosa
-      console.log('Debug - Error de conexión, simulando verificación exitosa');
-      return true;
+    } catch (_) {
+      // Opcional: considerar inválido si hay error de conexión
+      return false;
     }
   }
 
@@ -156,14 +100,6 @@
     <div class="text-center max-w-md">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
       <p class="text-gray-600 mb-4">Verificando autenticación...</p>
-
-      <!-- Debug info -->
-      {#if debugInfo}
-        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-left">
-          <h3 class="font-semibold text-yellow-800 mb-2">Información de Debug:</h3>
-          <pre class="text-xs text-yellow-700 whitespace-pre-wrap">{debugInfo}</pre>
-        </div>
-      {/if}
 
       {#if error}
         <div class="bg-red-50 border border-red-200 rounded-lg p-4 mt-4 text-left">
