@@ -6,7 +6,7 @@ Monorepo para todos los servicios de UniServices usando Turborepo + pnpm workspa
 
 1. **Clonar el repositorio:**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/UniServices.git
+   git clone https://github.com/Ferdinan7/UniServices.git
    cd UniServices
    ```
 
