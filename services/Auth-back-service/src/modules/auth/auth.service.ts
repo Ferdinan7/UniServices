@@ -41,7 +41,7 @@ export class AuthService {
     return data; // Retorna nueva session con access_token y refresh_token
   }
 
-  async logout(token: string) {
+  async logout(_token: string) {
     const { error } = await this.supabase.getClient().auth.signOut();
     if (error) throw new Error(error.message);
     return { message: 'Logout successful' };
@@ -60,7 +60,7 @@ export class AuthService {
         user: data.user,
         expires_at: data.user.last_sign_in_at,
       };
-    } catch (err) {
+    } catch {
       return { valid: false, error: 'Token validation failed' };
     }
   }

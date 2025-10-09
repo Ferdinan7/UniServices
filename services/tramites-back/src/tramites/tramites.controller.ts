@@ -1,7 +1,7 @@
-import {Controller, Get} from "@nestjs/common";
-import { TramitesService } from "./tramites.service";
+import { Controller, Get } from '@nestjs/common';
+import { TramitesService } from './tramites.service';
 
-@Controller("tramites")
+@Controller('tramites')
 export class TramitesController {
   constructor(private readonly tramitesService: TramitesService) {}
 
@@ -10,7 +10,7 @@ export class TramitesController {
     return this.tramitesService.getAll();
   }
 
-  @Get("grouped")
+  @Get('grouped')
   async findAllGrouped() {
     return this.tramitesService.findAllGrouped();
   }

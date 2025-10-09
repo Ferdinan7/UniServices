@@ -59,7 +59,7 @@ export class AuthService {
       }
 
       return data.data.signIn;
-    } catch (error) {
+    } catch {
       throw new HttpException('Authentication failed', HttpStatus.UNAUTHORIZED);
     }
   }
@@ -93,7 +93,7 @@ export class AuthService {
       }
 
       return data.data.signUp;
-    } catch (error) {
+    } catch {
       throw new HttpException(
         'User registration failed',
         HttpStatus.BAD_REQUEST,
@@ -133,7 +133,7 @@ export class AuthService {
       }
 
       return JSON.parse(data.data.signInComplete);
-    } catch (error) {
+    } catch {
       throw new HttpException('Authentication failed', HttpStatus.UNAUTHORIZED);
     }
   }
@@ -170,7 +170,7 @@ export class AuthService {
       }
 
       return JSON.parse(data.data.refreshToken);
-    } catch (error) {
+    } catch {
       throw new HttpException('Token refresh failed', HttpStatus.UNAUTHORIZED);
     }
   }
@@ -202,7 +202,7 @@ export class AuthService {
       }
 
       return JSON.parse(data.data.logout);
-    } catch (error) {
+    } catch {
       throw new HttpException('Logout failed', HttpStatus.BAD_REQUEST);
     }
   }
@@ -239,7 +239,7 @@ export class AuthService {
       }
 
       return JSON.parse(data.data.validateToken);
-    } catch (error) {
+    } catch {
       return { valid: false, error: 'Token validation failed' };
     }
   }
@@ -274,7 +274,7 @@ export class AuthService {
       }
 
       return JSON.parse(data.data.getUserInfo);
-    } catch (error) {
+    } catch {
       throw new HttpException(
         'Failed to get user info',
         HttpStatus.UNAUTHORIZED,

@@ -1,21 +1,24 @@
 <script>
-  export let title;
-  export let description;
-  export let link;
+	export let title;
+	export let description;
+	export let link;
 </script>
 
 <div
-  class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition flex flex-col justify-between"
+	class="flex flex-col justify-between rounded-xl bg-white p-6 shadow-md transition hover:shadow-lg"
 >
-  <h3 class="text-lg font-semibold mb-2">{title}</h3>
+	<h3 class="mb-2 text-lg font-semibold">{title}</h3>
 
-  <p class="text-gray-600 text-sm flex-grow">{description}</p>
+	<p class="flex-grow text-sm text-gray-600">{description}</p>
 
-  <a
-    href={link}
-    target="_blank"
-    class="mt-4 inline-block text-center bg-green-600 text-white text-sm font-medium py-2 px-4 rounded-lg hover:bg-green-700 transition"
-  >
-    Ir al trámite
-  </a>
+	<a
+		href={link}
+		target="_blank"
+		rel="noopener noreferrer"
+		data-sveltekit-reload
+		data-sveltekit-preload-data="off"
+		class="mt-4 inline-block rounded-lg bg-green-600 px-4 py-2 text-center text-sm font-medium text-white transition hover:bg-green-700"
+	>
+		Ir al trámite
+	</a>
 </div>
