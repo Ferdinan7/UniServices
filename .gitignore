@@ -117,3 +117,5 @@ dist/
 *.pem
 *.key
 *.crt
+
+scripts/

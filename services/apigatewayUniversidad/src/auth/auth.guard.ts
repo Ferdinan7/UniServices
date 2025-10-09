@@ -44,7 +44,7 @@ export class AuthGuard implements CanActivate {
       // Attach user information to request
       request.user = validation.user;
       return true;
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Token validation failed');
     }
   }

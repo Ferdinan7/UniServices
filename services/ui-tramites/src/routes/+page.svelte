@@ -50,6 +50,8 @@
 
 	onMount(async () => {
 		let tokenFromUrl: string | null = null;
+	onMount(async () => {
+		let tokenFromUrl: string | null = null;
 
 		try {
 			console.log('🔍 Iniciando verificación de autenticación...');
@@ -62,6 +64,8 @@
 			const tokenFromStorage = localStorage.getItem('access_token');
 			console.log('💾 Token en localStorage:', tokenFromStorage ? 'Encontrado' : 'No encontrado');
 
+			// Usar el token de la URL o del localStorage
+			accessToken = tokenFromUrl || tokenFromStorage;
 			// Usar el token de la URL o del localStorage
 			accessToken = tokenFromUrl || tokenFromStorage;
 
@@ -119,6 +123,7 @@
 		}
 	});
 
+
 	function logout() {
 		localStorage.removeItem('access_token');
 		const authServiceUrl = buildAuthUrl(AUTH_CONFIG.ENDPOINTS.LOGOUT, window.location.origin);
@@ -134,7 +139,22 @@
 				class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-green-600"
 			></div>
 			<p class="mb-4 text-gray-600">Verificando autenticación...</p>
+	<!-- Pantalla de carga mientras se verifica la autenticación -->
+	<div class="flex min-h-screen items-center justify-center bg-gray-100">
+		<div class="max-w-md text-center">
+			<div
+				class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-green-600"
+			></div>
+			<p class="mb-4 text-gray-600">Verificando autenticación...</p>
 
+			{#if error}
+				<div class="mt-4 rounded-lg border border-red-200 bg-red-50 p-4 text-left">
+					<h3 class="mb-2 font-semibold text-red-800">Error:</h3>
+					<p class="text-sm text-red-700">{error}</p>
+				</div>
+			{/if}
+		</div>
+	</div>
 			{#if error}
 				<div class="mt-4 rounded-lg border border-red-200 bg-red-50 p-4 text-left">
 					<h3 class="mb-2 font-semibold text-red-800">Error:</h3>
@@ -187,7 +207,41 @@
 					</button>
 				</div>
 			</header>
+		<!-- Main content -->
+		<div class="flex flex-1 flex-col">
+			<!-- Topbar -->
+			<header class="flex items-center justify-between bg-white p-4 shadow">
+				<h1 class="text-xl font-semibold text-gray-800">Sistema de Trámites</h1>
+				<div class="flex items-center gap-4">
+					<span class="flex items-center gap-2 text-gray-700">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-6 w-6 text-gray-500"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M5.121 17.804A9 9 0 1119 12v1.5M15 21H9m6-4H9m12-4h-4a4 4 0 00-8 0H5a7 7 0 0114 0z"
+							/>
+						</svg>
+						<span>Usuario Autenticado</span>
+					</span>
+					<button
+						on:click={logout}
+						class="rounded-lg bg-red-600 px-4 py-2 text-white transition hover:bg-red-700"
+					>
+						Cerrar Sesión
+					</button>
+				</div>
+			</header>
 
+			<!-- Content -->
+			<main class="flex-1 overflow-y-auto p-8">
+				<h2 class="mb-8 text-3xl font-bold text-gray-800">Catálogo de Trámites</h2>
 			<!-- Content -->
 			<main class="flex-1 overflow-y-auto p-8">
 				<h2 class="mb-8 text-3xl font-bold text-gray-800">Catálogo de Trámites</h2>

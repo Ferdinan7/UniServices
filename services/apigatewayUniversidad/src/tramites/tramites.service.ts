@@ -8,8 +8,10 @@ export class TramitesService {
   private readonly timeout: number;
 
   constructor(private configService: ConfigService) {
-    const servicesConfig = this.configService.get<ServicesConfig>('servicesConfig');
-    this.tramitesServiceUrl = servicesConfig?.tramitesService.url || 'http://localhost:3550/tramites';
+    const servicesConfig =
+      this.configService.get<ServicesConfig>('servicesConfig');
+    this.tramitesServiceUrl =
+      servicesConfig?.tramitesService.url || 'http://localhost:3550/tramites';
     this.timeout = servicesConfig?.tramitesService.timeout || 5000;
   }
 
@@ -36,7 +38,7 @@ export class TramitesService {
       if (error instanceof HttpException) {
         throw error;
       }
-      
+
       console.error('Error fetching tramites:', error);
       throw new HttpException(
         'Failed to fetch tramites from service',
@@ -68,7 +70,7 @@ export class TramitesService {
       if (error instanceof HttpException) {
         throw error;
       }
-      
+
       console.error('Error fetching grouped tramites:', error);
       throw new HttpException(
         'Failed to fetch grouped tramites from service',

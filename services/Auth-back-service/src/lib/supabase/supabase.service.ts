@@ -38,7 +38,7 @@ export class SupabaseService {
     this.supabase = createClient(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_ANON_KEY!,
-    ) as any;
+    );
 
     // Log de inicialización
     this.logger.info('🚀 Inicializando SupabaseService', {

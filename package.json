@@ -17,7 +17,10 @@
     "dev:ui": "cd services/ui-tramites && npm run dev",
     "dev:auth-back": "cd services/Auth-back-service && npm run start:dev",
     "build": "turbo run build",
-    "lint": "turbo run lint"
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "test:cov": "turbo run test:cov",
+    "clean": "turbo run clean"
   },
   "keywords": [],
   "author": "",

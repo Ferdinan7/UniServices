@@ -1,0 +1,99 @@
+name: CI/CD Pipeline (Minimal)
+
+on:
+    push:
+        branches:
+            - master
+            - main
+            - develop
+    pull_request:
+        branches:
+            - master
+            - main
+            - develop
+
+# Cancelar ejecuciones anteriores si hay un nuevo push
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+env:
+    NODE_VERSION: "18"
+    PNPM_VERSION: "10.11.0"
+
+jobs:
+    # Job 1: Solo Linting (el más rápido)
+    lint:
+        name: 🔍 Lint Check
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: 📥 Checkout code
+              uses: actions/checkout@v4
+
+            - name: 📦 Setup pnpm
+              uses: pnpm/action-setup@v3
+              with:
+                  version: ${{ env.PNPM_VERSION }}
+
+            - name: 🔧 Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: "pnpm"
+
+            - name: 📥 Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: 🔍 Run ESLint
+              run: pnpm run lint
+              continue-on-error: false
+
+            - name: 📋 Summary
+              if: always()
+              run: |
+                  echo "## 🔍 Lint Check Completed" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "✅ ESLint validation completed" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+                  echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+                  echo "**Author:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+
+    # JOBS DESACTIVADOS TEMPORALMENTE POR COSTOS
+    # Descomentar cuando resuelvas el problema de facturación
+
+    # setup:
+    #     name: 📦 Setup & Install Dependencies
+    #     runs-on: ubuntu-latest
+    #     if: false  # DESACTIVADO
+    #     steps:
+    #       - uses: actions/checkout@v4
+    #       # ... resto del job
+
+    # test:
+    #     name: 🧪 Run Tests
+    #     runs-on: ubuntu-latest
+    #     if: false  # DESACTIVADO
+    #     needs: lint
+    #     steps:
+    #       - uses: actions/checkout@v4
+    #       # ... resto del job
+
+    # build:
+    #     name: 🏗️ Build Application
+    #     runs-on: ubuntu-latest
+    #     if: false  # DESACTIVADO
+    #     needs: [lint]
+    #     steps:
+    #       - uses: actions/checkout@v4
+    #       # ... resto del job
+
+    # swagger-docs:
+    #     name: 📚 Generate Swagger Documentation
+    #     runs-on: ubuntu-latest
+    #     if: false  # DESACTIVADO
+    #     needs: build
+    #     steps:
+    #       - uses: actions/checkout@v4
+    #       # ... resto del job

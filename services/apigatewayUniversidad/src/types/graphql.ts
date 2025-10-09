@@ -13,4 +13,3 @@ export interface GraphQLResolver {
   Mutation?: any;
   Subscription?: any;
 }
-

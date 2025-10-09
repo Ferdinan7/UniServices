@@ -1,5 +1,5 @@
-import { Module } from "@nestjs/common";
-import { TramitesModule } from "./tramites/tramites.module";
+import { Module } from '@nestjs/common';
+import { TramitesModule } from './tramites/tramites.module';
 
 @Module({
   imports: [TramitesModule],

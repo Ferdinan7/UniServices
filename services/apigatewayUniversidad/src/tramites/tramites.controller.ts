@@ -5,14 +5,12 @@ import {
   Request,
   HttpException,
   HttpStatus,
-  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard, Role } from '../auth/roles.guard';
@@ -44,7 +42,7 @@ export class TramitesController {
           category: { type: 'string' },
           requirements: {
             type: 'array',
-            items: { type: 'string' }
+            items: { type: 'string' },
           },
           estimatedTime: { type: 'string' },
           cost: { type: 'number' },
@@ -60,7 +58,7 @@ export class TramitesController {
     try {
       const token = req.headers.authorization?.split(' ')[1];
       return await this.tramitesService.getAllTramites(token);
-    } catch (error) {
+    } catch {
       throw new HttpException(
         'Error fetching tramites',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -89,7 +87,7 @@ export class TramitesController {
             category: { type: 'string' },
             requirements: {
               type: 'array',
-              items: { type: 'string' }
+              items: { type: 'string' },
             },
             estimatedTime: { type: 'string' },
             cost: { type: 'number' },
@@ -106,7 +104,7 @@ export class TramitesController {
     try {
       const token = req.headers.authorization?.split(' ')[1];
       return await this.tramitesService.getGroupedTramites(token);
-    } catch (error) {
+    } catch {
       throw new HttpException(
         'Error fetching grouped tramites',
         HttpStatus.INTERNAL_SERVER_ERROR,

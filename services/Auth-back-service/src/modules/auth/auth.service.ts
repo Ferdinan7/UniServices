@@ -69,7 +69,7 @@ export class AuthService {
    * Cierra sesión del usuario
    * Log automático: "🔐 Iniciando SIGN_OUT"
    */
-  async logout(token: string) {
+  async logout(_token: string) {
     const { error } = await this.supabase.auth.signOut();
     if (error) throw new Error(error.message);
     return { message: 'Logout successful' };
@@ -92,7 +92,7 @@ export class AuthService {
         user: data.user,
         expires_at: data.user.last_sign_in_at,
       };
-    } catch (err) {
+    } catch {
       return { valid: false, error: 'Token validation failed' };
     }
   }
