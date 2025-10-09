@@ -1,21 +1,22 @@
-<script>
-  export let title;
-  export let description;
-  export let link;
+<!-- src/lib/components/TramiteCard.svelte -->
+<script lang="ts">
+	import type { IButton } from '$lib/ui';
+
+	export let title: string;
+	export let description: string;
+	export let link: string;
+	export let button: IButton;
 </script>
 
 <div
-  class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition flex flex-col justify-between"
+	class="flex h-full flex-col justify-between rounded-xl bg-white p-6 shadow-md transition hover:shadow-lg"
 >
-  <h3 class="text-lg font-semibold mb-2">{title}</h3>
+	<div>
+		<h3 class="mb-2 text-lg font-semibold text-gray-800">{title}</h3>
+		<p class="mb-4 text-sm text-gray-600">{description}</p>
+	</div>
 
-  <p class="text-gray-600 text-sm flex-grow">{description}</p>
-
-  <a
-    href={link}
-    target="_blank"
-    class="mt-4 inline-block text-center bg-green-600 text-white text-sm font-medium py-2 px-4 rounded-lg hover:bg-green-700 transition"
-  >
-    Ir al trámite
-  </a>
+	<div class="mt-auto">
+		<svelte:component this={button.component} {...button.props} href={link} target="_blank" />
+	</div>
 </div>

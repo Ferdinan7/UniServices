@@ -4,7 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "turbo run test",
+    "test:coverage": "turbo run test:coverage",
+    "test:watch": "turbo run test:watch",
+    "test:ci": "turbo run test --parallel",
+    "test:report": "node scripts/generate-reports.js",
+    "test:patterns": "node scripts/test-patterns.js",
+    "dev": "turbo run dev",
+    "dev:gateway": "cd services/apigatewayUniversidad && npm run start:dev",
+    "dev:tramites": "cd services/tramites-back && npm run start:dev",
+    "dev:auth": "cd services/uniauth && npm run dev",
+    "dev:ui": "cd services/ui-tramites && npm run dev",
+    "dev:auth-back": "cd services/Auth-back-service && npm run start:dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint"
   },
   "keywords": [],
   "author": "",

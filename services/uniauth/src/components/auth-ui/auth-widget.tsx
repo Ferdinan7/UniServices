@@ -1,5 +1,25 @@
+// src/components/auth-ui/auth-widget.tsx
 import { Component, h, State, getAssetPath, Prop } from '@stencil/core';
+import { authService } from '../../services/AuthService';
+import { GoogleOAuthStrategy } from '../../strategies/GoogleOAuthStrategy';
+import type { AuthResult } from '../../strategies/IAuthStrategy';
 
+/**
+ * Componente de autenticación que implementa el patrón Strategy
+ *
+ * Este componente usa AuthService que actúa como Context del patrón Strategy,
+ * delegando las operaciones de autenticación a diferentes estrategias:
+ * - EmailPasswordStrategy: Para autenticación con email y contraseña
+ * - GoogleOAuthStrategy: Para autenticación con Google OAuth
+ *
+ * Patrón Strategy aplicado:
+ * - Context: AuthService
+ * - Strategies: EmailPasswordStrategy, GoogleOAuthStrategy
+ * - Client: Este componente (auth-widget)
+ *
+ * El componente no necesita conocer los detalles de implementación de cada
+ * estrategia, solo usa la interfaz común proporcionada por AuthService.
+ */
 @Component({
   tag: 'auth-widget',
   styleUrl: 'component.css',
@@ -11,124 +31,131 @@ export class AuthWidget {
   @State() password: string = '';
   @State() error: string = '';
   @State() message: string = '';
+  @State() loading: boolean = false;
 
   @Prop() image: string = 'bike.png';
   @Prop() height: string = '600px';
+  @Prop() redirectAfterLogin: string = 'http://localhost:5173';
 
-  private backendUrl: string = 'http://localhost:3000/graphql'; // Corregido el puerto
-
+  /**
+   * Maneja el login con Email y Password usando el patrón Strategy
+   * La estrategia EmailPasswordStrategy se selecciona automáticamente
+   */
   private async signIn(e: Event) {
     e.preventDefault();
+
+    // Limpiar mensajes previos
     this.error = '';
     this.message = '';
-
-    const query = `
-      mutation {
-        signInComplete(email: "${this.email}", password: "${this.password}")
-      }`;
+    this.loading = true;
 
     try {
-      const response = await fetch(this.backendUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query }),
-      });
+      console.log('🔐 Iniciando autenticación con Email/Password (Strategy Pattern)');
 
-      const result = await response.json();
+      // Usar AuthService con la estrategia de Email/Password
+      // El servicio internamente selecciona y usa EmailPasswordStrategy
+      const result: AuthResult = await authService.authenticateWithEmailPassword(this.email, this.password);
 
-      if (result.errors) {
-        this.error = result.errors[0].message;
-      } else {
-        // Parsear la respuesta del backend (viene como string JSON)
-        const authData = JSON.parse(result.data.signInComplete);
+      if (result.success) {
+        this.message = '✅ Login successful!';
+        console.log('✅ Autenticación exitosa:', result.user);
 
-        // Guardar token en localStorage para uso futuro
-        if (authData.access_token) {
-          localStorage.setItem('auth_token', authData.access_token);
-          localStorage.setItem('refresh_token', authData.refresh_token);
-          localStorage.setItem('user_info', JSON.stringify(authData.user));
-        }
-
-        this.message = 'Login successful!';
-
-        // Redirección a YouTube después de login con email/password
+        // Redirección después del login
         setTimeout(() => {
-          window.location.href = 'https://youtube.com';
+          window.location.href = this.redirectAfterLogin;
         }, 1500);
+      } else {
+        this.error = result.error || 'Error de autenticación';
+        console.error('❌ Error en autenticación:', result.error);
       }
     } catch (err) {
-      this.error = `Error: ${err}`;
+      this.error = `Error: ${err instanceof Error ? err.message : 'Error desconocido'}`;
+      console.error('❌ Error en signIn:', err);
+    } finally {
+      this.loading = false;
     }
   }
 
+  /**
+   * Maneja el login con Google OAuth usando el patrón Strategy
+   * La estrategia GoogleOAuthStrategy se selecciona automáticamente
+   */
   private async signInWithGoogle() {
     try {
+      // Limpiar mensajes previos
       this.error = '';
+      this.message = 'Redirigiendo a Google...';
+      this.loading = true;
 
-      // 👉 OAuth con Supabase usando redirección específica para Google
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabase = createClient(
-        'https://sirtkdkbqsklncyoallp.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpcnRrZGticXNrbG5jeW9hbGxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3Njg3NDMsImV4cCI6MjA3NDM0NDc0M30.B4EHoGBWHaW5RDPT0YbqVVrpwJ4EsWsKBt6yVbwQXAA'
-      );
+      console.log('🔐 Iniciando autenticación con Google OAuth (Strategy Pattern)');
 
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          // Redirección específica para Google Auth
-          redirectTo: 'http://localhost:5173',
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
-      });
+      // Usar AuthService con la estrategia de Google OAuth
+      // El servicio internamente selecciona y usa GoogleOAuthStrategy
+      const result: AuthResult = await authService.authenticateWithGoogle('http://localhost:5173');
 
-      if (error) {
-        this.error = error.message;
+      if (result.success) {
+        console.log('✅ Redirección a Google iniciada');
+        // La redirección a Google se maneja automáticamente por la estrategia
+        // No necesitamos hacer nada más aquí
+      } else {
+        this.error = result.error || 'Error al iniciar autenticación con Google';
+        console.error('❌ Error en Google OAuth:', result.error);
+        this.loading = false;
       }
     } catch (err) {
       this.error = 'Error starting Google auth';
+      console.error('❌ Error en signInWithGoogle:', err);
+      this.loading = false;
     }
   }
 
-  // Método para manejar el callback de Google (si necesitas procesar el token)
+  /**
+   * Maneja el callback de Google OAuth después de la redirección
+   * Usa la estrategia GoogleOAuthStrategy para procesar el callback
+   */
   private async handleGoogleCallback() {
     try {
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabase = createClient(
-        'https://sirtkdkbqsklncyoallp.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpcnRrZGticXNrbG5jeW9hbGxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3Njg3NDMsImV4cCI6MjA3NDM0NDc0M30.B4EHoGBWHaW5RDPT0YbqVVrpwJ4EsWsKBt6yVbwQXAA'
-      );
+      console.log('🔄 Procesando callback de Google OAuth (Strategy Pattern)');
 
-      // Obtener la sesión actual después del callback
-      const { data: { session }, error } = await supabase.auth.getSession();
+      // Usar AuthService para manejar el callback de Google
+      // El servicio delega a GoogleOAuthStrategy.handleCallback()
+      const result: AuthResult = await authService.handleOAuthCallback('google-oauth');
 
-      if (error) {
-        console.error('Error getting session:', error);
-        return;
-      }
+      if (result.success) {
+        console.log('✅ Callback de Google procesado exitosamente:', result.user);
+        this.message = '✅ Login with Google successful!';
 
-      if (session) {
-        // Guardar tokens para uso futuro
-        localStorage.setItem('auth_token', session.access_token);
-        localStorage.setItem('refresh_token', session.refresh_token);
-        localStorage.setItem('user_info', JSON.stringify(session.user));
+        // Limpiar parámetros de OAuth de la URL
+        GoogleOAuthStrategy.cleanOAuthParams();
 
-        console.log('Google auth successful:', session.user);
+        // Redirección después del login con el token en la URL
+        const token = result.accessToken;
+        setTimeout(() => {
+          const redirectUrl = new URL(this.redirectAfterLogin);
+          redirectUrl.searchParams.set('access_token', token || '');
+          if (result.user) {
+            redirectUrl.searchParams.set('user_id', result.user.id || '');
+            redirectUrl.searchParams.set('user_email', result.user.email || '');
+          }
+          window.location.href = redirectUrl.toString();
+        }, 1500);
+      } else {
+        console.error('❌ Error procesando callback:', result.error);
+        this.error = result.error || 'Error processing Google authentication';
       }
     } catch (err) {
-      console.error('Error handling Google callback:', err);
+      console.error('❌ Error handling Google callback:', err);
+      this.error = 'Error processing authentication';
     }
   }
 
-  // Verificar si estamos en una página de callback al cargar
+  /**
+   * Verifica si estamos en una página de callback OAuth al cargar el componente
+   */
   componentDidLoad() {
-    // Si hay parámetros de URL que indican callback de OAuth
-    const urlParams = new URLSearchParams(window.location.search);
-    const hasAuthCallback = urlParams.has('access_token') || urlParams.has('code');
-
-    if (hasAuthCallback) {
+    // Verificar si estamos en un callback de OAuth
+    if (GoogleOAuthStrategy.isOAuthCallback()) {
+      console.log('📍 Detectado callback de OAuth, procesando...');
       this.handleGoogleCallback();
     }
   }
@@ -159,26 +186,19 @@ export class AuthWidget {
               <h5 class="text-2xl font-bold text-gray-900 text-center">Sign in to our platform</h5>
 
               {/* Mensajes de error y éxito */}
-              {this.error && (
-                <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">
-                  {this.error}
-                </div>
-              )}
+              {this.error && <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">{this.error}</div>}
 
-              {this.message && (
-                <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50">
-                  {this.message}
-                </div>
-              )}
+              {this.message && <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50">{this.message}</div>}
 
-              {/* Botón Google */}
+              {/* Botón Google - Usa GoogleOAuthStrategy */}
               <button
                 onClick={() => this.signInWithGoogle()}
                 type="button"
-                class="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-700 font-medium rounded-lg text-sm px-5 py-2.5 hover:bg-gray-50"
+                disabled={this.loading}
+                class="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-700 font-medium rounded-lg text-sm px-5 py-2.5 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google" />
-                Sign in with Google
+                {this.loading ? 'Processing...' : 'Sign in with Google'}
               </button>
 
               {/* Separador */}
@@ -188,7 +208,7 @@ export class AuthWidget {
                 <hr class="flex-grow border-gray-300" />
               </div>
 
-              {/* Inputs */}
+              {/* Email Input */}
               <div>
                 <label htmlFor="email" class="block mb-2 text-sm font-medium text-gray-900">
                   Your email
@@ -200,10 +220,12 @@ export class AuthWidget {
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                   placeholder="name@company.com"
                   required
+                  disabled={this.loading}
                   onInput={(e: any) => (this.email = e.target.value)}
                 />
               </div>
 
+              {/* Password Input */}
               <div>
                 <label htmlFor="password" class="block mb-2 text-sm font-medium text-gray-900">
                   Your password
@@ -215,25 +237,26 @@ export class AuthWidget {
                   placeholder="••••••••"
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                   required
+                  disabled={this.loading}
                   onInput={(e: any) => (this.password = e.target.value)}
                 />
               </div>
 
-              {/* Botón login */}
+              {/* Botón login con Email/Password - Usa EmailPasswordStrategy */}
               <button
                 type="submit"
                 onClick={e => this.signIn(e)}
-                class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5"
+                disabled={this.loading}
+                class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Login
+                {this.loading ? 'Authenticating...' : 'Login with Email'}
               </button>
-
             </form>
           </div>
 
           {/* Columna Derecha - Imagen */}
           <div class="relative overflow-hidden">
-            <img src={imageSrc} alt="Motobike" class="block w-full h-full object-cover" />
+            <img src={imageSrc} alt="Authentication" class="block w-full h-full object-cover" />
           </div>
         </div>
       </div>

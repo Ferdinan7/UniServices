@@ -1,0 +1,14 @@
+{
+  "timestamp": "2025-10-09T06:34:15.889Z",
+  "services": [],
+  "summary": {
+    "totalLines": 0,
+    "coveredLines": 0,
+    "totalFunctions": 0,
+    "coveredFunctions": 0,
+    "totalBranches": 0,
+    "coveredBranches": 0,
+    "totalStatements": 0,
+    "coveredStatements": 0
+  }
+}

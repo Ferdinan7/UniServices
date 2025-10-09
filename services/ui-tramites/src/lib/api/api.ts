@@ -1,23 +1,45 @@
 // src/lib/api.ts
 export async function getTramites(token?: string) {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+	console.log('🌐 getTramites - Iniciando petición...');
+	console.log('🔑 Token presente:', token ? 'Sí' : 'No');
 
-  // Agregar token de autenticación si está disponible
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+	const headers: Record<string, string> = {
+		'Content-Type': 'application/json'
+	};
 
-  const res = await fetch("http://localhost:4000/api/v1/tramites/grouped", {
-    method: "GET",
-    headers,
-  });
+	// Agregar token de autenticación si está disponible
+	if (token) {
+		headers.Authorization = `Bearer ${token}`;
+		console.log('✅ Header Authorization agregado');
+	}
 
-  if (!res.ok) {
-    throw new Error(`Error al obtener trámites: ${res.statusText}`);
-  }
+	const url = 'http://localhost:4000/api/v1/tramites/grouped';
+	console.log('📍 URL:', url);
 
-  const data = await res.json();
-  return data;
+	try {
+		console.log('⏳ Haciendo fetch...');
+		const res = await fetch(url, {
+			method: 'GET',
+			headers
+		});
+
+		console.log('📡 Respuesta recibida:', {
+			status: res.status,
+			statusText: res.statusText,
+			ok: res.ok
+		});
+
+		if (!res.ok) {
+			const errorText = await res.text();
+			console.error('❌ Error en respuesta:', errorText);
+			throw new Error(`Error al obtener trámites: ${res.statusText} - ${errorText}`);
+		}
+
+		const data = await res.json();
+		console.log('✅ Datos recibidos:', data);
+		return data;
+	} catch (error) {
+		console.error('❌ Error en getTramites:', error);
+		throw error;
+	}
 }

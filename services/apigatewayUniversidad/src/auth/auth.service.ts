@@ -1,6 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { createClient } from '@supabase/supabase-js';
 
 export interface User {
   id: string;
@@ -22,10 +23,21 @@ export interface AuthResult {
 
 @Injectable()
 export class AuthService {
+  private supabase: any;
+
   constructor(
     private configService: ConfigService,
     private jwtService: JwtService,
-  ) {}
+  ) {
+    const supabaseUrl =
+      this.configService.get<string>('servicesConfig.supabase.url') ||
+      'https://sirtkdkbqsklncyoallp.supabase.co';
+    const supabaseKey =
+      this.configService.get<string>('servicesConfig.supabase.anonKey') ||
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpcnRrZGticXNrbG5jeW9hbGxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3Njg3NDMsImV4cCI6MjA3NDM0NDc0M30.B4EHoGBWHaW5RDPT0YbqVVrpwJ4EsWsKBt6yVbwQXAA';
+
+    this.supabase = createClient(supabaseUrl, supabaseKey);
+  }
 
   async signIn(email: string, password: string): Promise<string> {
     const authServiceUrl =
@@ -210,7 +222,44 @@ export class AuthService {
   async validateToken(
     token: string,
   ): Promise<{ valid: boolean; user?: User; error?: string }> {
-    // Validar usando el microservicio de auth
+    // Intentar validar con Supabase primero (para tokens de Google OAuth)
+    try {
+      const { data, error } = await this.supabase.auth.getUser(token);
+
+      if (error) {
+        console.log(
+          'Supabase validation failed, trying GraphQL auth service...',
+          error.message,
+        );
+        // Si falla Supabase, intentar con el servicio de auth GraphQL
+        return await this.validateTokenWithGraphQL(token);
+      }
+
+      if (data?.user) {
+        // Token de Supabase válido
+        const user: User = {
+          id: data.user.id,
+          email: data.user.email || '',
+          role: data.user.role || 'authenticated',
+          email_confirmed_at: data.user.email_confirmed_at,
+          app_metadata: data.user.app_metadata,
+          user_metadata: data.user.user_metadata,
+        };
+
+        return { valid: true, user };
+      }
+
+      return { valid: false, error: 'Invalid token' };
+    } catch (error) {
+      console.error('Error validating token with Supabase:', error);
+      // Intentar con GraphQL como fallback
+      return await this.validateTokenWithGraphQL(token);
+    }
+  }
+
+  private async validateTokenWithGraphQL(
+    token: string,
+  ): Promise<{ valid: boolean; user?: User; error?: string }> {
     try {
       const authServiceUrl =
         this.configService.get<string>('authService.url') ??

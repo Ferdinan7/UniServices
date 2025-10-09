@@ -53,18 +53,11 @@ UniServices/
 
 ## 🛠️ Comandos Disponibles
 
+### 🚀 Desarrollo
+
 ```bash
 # Ejecutar todos los servicios en desarrollo
 pnpm turbo run dev
-
-# Compilar todos los servicios
-pnpm turbo run build
-
-# Limpiar builds
-pnpm turbo run clean
-
-# Instalar dependencias
-pnpm install
 
 # Ejecutar servicio específico
 pnpm --filter ui-tramites dev
@@ -74,6 +67,73 @@ pnpm --filter tramites-back dev
 pnpm --filter uniauth dev
 ```
 
+### 🧪 Testing y Cobertura
+
+```bash
+# Ejecutar todos los tests
+pnpm test
+
+# Ejecutar tests con cobertura
+pnpm test:coverage
+
+# Ejecutar tests en modo watch
+pnpm test:watch
+
+# Ejecutar tests en CI
+pnpm test:ci
+
+# Generar reporte completo de tests y patrones de diseño
+pnpm test:report
+```
+
+### 📊 Tests por Servicio
+
+```bash
+# ui-tramites (Vitest) - Patrón Abstract Factory
+cd services/ui-tramites
+pnpm test                    # Ejecutar tests
+pnpm test:coverage           # Tests con cobertura
+pnpm test:watch              # Modo watch
+
+# tramites-back (Jest) - Patrón DAO
+cd services/tramites-back
+pnpm test                    # Ejecutar tests
+pnpm test:coverage           # Tests con cobertura
+pnpm test:watch              # Modo watch
+
+# uniauth (Stencil) - Patrón Strategy
+cd services/uniauth
+pnpm test                    # Ejecutar tests
+pnpm test:coverage           # Tests con cobertura
+pnpm test:watch              # Modo watch
+
+# apigatewayUniversidad (Jest)
+cd services/apigatewayUniversidad
+pnpm test                    # Ejecutar tests
+pnpm test:coverage           # Tests con cobertura
+
+# Auth-back-service (Jest)
+cd services/Auth-back-service
+pnpm test                    # Ejecutar tests
+pnpm test:coverage           # Tests con cobertura
+```
+
+### 🏗️ Build y Utilidades
+
+```bash
+# Compilar todos los servicios
+pnpm turbo run build
+
+# Limpiar builds
+pnpm turbo run clean
+
+# Instalar dependencias
+pnpm install
+
+# Linting
+pnpm turbo run lint
+```
+
 ## 🔧 Tecnologías
 
 - **🏧 Monorepo:** Turborepo + pnpm workspaces
@@ -81,7 +141,37 @@ pnpm --filter uniauth dev
 - **🚀 Backend:** NestJS + TypeScript
 - **📊 GraphQL:** Apollo Server
 - **🔧 Components:** Stencil.js
+- **🧪 Testing:** Jest, Vitest, Stencil Testing
 
+## 🏛️ Patrones de Diseño Implementados
+
+### ui-tramites
+- **Abstract Factory:** Creación de familias de componentes UI (botones modernos, clásicos, minimalistas)
+- **Singleton:** Gestión de instancias únicas (UIFactoryProvider)
+
+### tramites-back
+- **DAO (Data Access Object):** Abstracción del acceso a datos de trámites
+- **Service Layer:** Separación de lógica de negocio
+- **Decorator:** Validación y transformación de datos
+
+### uniauth
+- **Strategy:** Múltiples estrategias de autenticación intercambiables (Email/Password, Google OAuth)
+- **Component Pattern:** Web Components reutilizables
+
+### apigatewayUniversidad
+- **Gateway Pattern:** Punto único de entrada para todos los servicios
+- **Strategy Pattern:** Diferentes estrategias de enrutamiento
+- **Guard Pattern:** Validación y autorización
+
+## 📊 Reportes de Testing
+
+El proyecto genera reportes detallados que incluyen:
+- ✅ Cobertura de tests por servicio
+- 🏛️ Análisis de patrones de diseño implementados
+- 📈 Métricas de calidad del código
+- 🎯 Recomendaciones de mejora
+
+Los reportes se generan en la carpeta `reports/` y se actualizan con cada ejecución de `pnpm test:report`.
 
 ## 📋 Requisitos
 

@@ -1,0 +1,189 @@
+{
+  "timestamp": "2025-10-09T06:34:15.893Z",
+  "summary": {
+    "totalPatterns": 17,
+    "patternsByService": {
+      "apigatewayUniversidad": 5,
+      "Auth-back-service": 3,
+      "tramites-back": 4,
+      "ui-tramites": 3,
+      "uniauth": 2
+    },
+    "patternUsage": {
+      "Gateway Pattern": 1,
+      "Service Layer": 3,
+      "Strategy Pattern": 1,
+      "Dependency Injection": 3,
+      "Guard Pattern": 1,
+      "Repository Pattern": 2,
+      "DAO Pattern": 1,
+      "Abstract Factory": 1,
+      "Singleton": 1,
+      "Component Pattern": 2,
+      "Web Components": 1
+    }
+  },
+  "services": [
+    {
+      "name": "apigatewayUniversidad",
+      "patterns": [
+        "Gateway Pattern",
+        "Service Layer",
+        "Strategy Pattern",
+        "Dependency Injection",
+        "Guard Pattern"
+      ],
+      "testFramework": "jest"
+    },
+    {
+      "name": "Auth-back-service",
+      "patterns": [
+        "Service Layer",
+        "Dependency Injection",
+        "Repository Pattern"
+      ],
+      "testFramework": "jest"
+    },
+    {
+      "name": "tramites-back",
+      "patterns": [
+        "DAO Pattern",
+        "Service Layer",
+        "Repository Pattern",
+        "Dependency Injection"
+      ],
+      "testFramework": "jest"
+    },
+    {
+      "name": "ui-tramites",
+      "patterns": [
+        "Abstract Factory",
+        "Singleton",
+        "Component Pattern"
+      ],
+      "testFramework": "vitest"
+    },
+    {
+      "name": "uniauth",
+      "patterns": [
+        "Component Pattern",
+        "Web Components"
+      ],
+      "testFramework": "stencil"
+    }
+  ],
+  "patterns": {
+    "Service Layer Pattern": {
+      "description": "Separación clara entre lógica de negocio y capa de presentación",
+      "services": [],
+      "benefits": [
+        "Separación de responsabilidades",
+        "Fácil testing con mocks",
+        "Reutilización de lógica"
+      ]
+    },
+    "DAO Pattern": {
+      "description": "Abstracción del acceso a datos",
+      "services": [
+        "tramites-back"
+      ],
+      "benefits": [
+        "Separación entre lógica y datos",
+        "Facilita cambio de BD",
+        "Mejora testabilidad"
+      ]
+    },
+    "Dependency Injection": {
+      "description": "Inyección automática de dependencias",
+      "services": [
+        "apigatewayUniversidad",
+        "Auth-back-service",
+        "tramites-back"
+      ],
+      "benefits": [
+        "Bajo acoplamiento",
+        "Testing simplificado",
+        "Gestión automática del ciclo de vida"
+      ]
+    },
+    "Gateway Pattern": {
+      "description": "Punto único de entrada que enruta peticiones",
+      "services": [
+        "apigatewayUniversidad"
+      ],
+      "benefits": [
+        "Punto único de acceso",
+        "Seguridad centralizada",
+        "Simplifica cliente frontend"
+      ]
+    },
+    "Strategy Pattern": {
+      "description": "Múltiples estrategias para resolver un problema",
+      "services": [
+        "apigatewayUniversidad"
+      ],
+      "benefits": [
+        "Flexibilidad en algoritmos",
+        "Extensibilidad",
+        "Separation of concerns"
+      ]
+    },
+    "Abstract Factory": {
+      "description": "Creación de familias de objetos relacionados",
+      "services": [
+        "ui-tramites"
+      ],
+      "benefits": [
+        "Consistencia en creación",
+        "Intercambiabilidad",
+        "Escalabilidad"
+      ]
+    },
+    "Singleton": {
+      "description": "Una sola instancia de una clase",
+      "services": [
+        "ui-tramites"
+      ],
+      "benefits": [
+        "Control de instancia",
+        "Acceso global",
+        "Gestión de estado"
+      ]
+    },
+    "Component Pattern": {
+      "description": "Composición de elementos reutilizables",
+      "services": [
+        "ui-tramites",
+        "uniauth"
+      ],
+      "benefits": [
+        "Reutilización",
+        "Modularidad",
+        "Mantenibilidad"
+      ]
+    },
+    "Guard Pattern": {
+      "description": "Interceptores para autorización y validación",
+      "services": [
+        "apigatewayUniversidad"
+      ],
+      "benefits": [
+        "Seguridad centralizada",
+        "Validación consistente",
+        "Separación de concerns"
+      ]
+    },
+    "Repository Pattern": {
+      "description": "Abstracción para acceso a colecciones de datos",
+      "services": [
+        "Auth-back-service",
+        "tramites-back"
+      ],
+      "benefits": [
+        "Testabilidad",
+        "Consistencia en acceso a datos",
+        "Flexibilidad"
+      ]
+    }
+  }
+}

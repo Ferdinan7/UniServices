@@ -1,5 +1,5 @@
 import { Config } from '@stencil/core';
-import tailwind from 'stencil-tailwind-plugin'
+import tailwind from 'stencil-tailwind-plugin';
 
 export const config: Config = {
   namespace: 'uniauth',
@@ -23,12 +23,23 @@ export const config: Config = {
     },
   ],
   testing: {
-    browserHeadless: "shell",
+    browserHeadless: 'shell',
+    collectCoverage: true,
+    coverageDirectory: 'coverage',
+    coverageReporters: ['text', 'lcov', 'html', 'json-summary'],
+    coverageThreshold: {
+      global: {
+        branches: 70,
+        functions: 70,
+        lines: 70,
+        statements: 70,
+      },
+    },
+    testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+    testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(tsx?|ts?)$',
   },
-  plugins: [
-    tailwind()
-  ],
+  plugins: [tailwind()],
   devServer: {
-    reloadStrategy: 'pageReload'
-  }
+    reloadStrategy: 'pageReload',
+  },
 };

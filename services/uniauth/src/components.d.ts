@@ -6,6 +6,19 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    /**
+     * Componente de autenticación que implementa el patrón Strategy
+     * Este componente usa AuthService que actúa como Context del patrón Strategy,
+     * delegando las operaciones de autenticación a diferentes estrategias:
+     * - EmailPasswordStrategy: Para autenticación con email y contraseña
+     * - GoogleOAuthStrategy: Para autenticación con Google OAuth
+     * Patrón Strategy aplicado:
+     * - Context: AuthService
+     * - Strategies: EmailPasswordStrategy, GoogleOAuthStrategy
+     * - Client: Este componente (auth-widget)
+     * El componente no necesita conocer los detalles de implementación de cada
+     * estrategia, solo usa la interfaz común proporcionada por AuthService.
+     */
     interface AuthWidget {
         /**
           * @default '600px'
@@ -15,9 +28,26 @@ export namespace Components {
           * @default 'bike.png'
          */
         "image": string;
+        /**
+          * @default 'http://localhost:5173'
+         */
+        "redirectAfterLogin": string;
     }
 }
 declare global {
+    /**
+     * Componente de autenticación que implementa el patrón Strategy
+     * Este componente usa AuthService que actúa como Context del patrón Strategy,
+     * delegando las operaciones de autenticación a diferentes estrategias:
+     * - EmailPasswordStrategy: Para autenticación con email y contraseña
+     * - GoogleOAuthStrategy: Para autenticación con Google OAuth
+     * Patrón Strategy aplicado:
+     * - Context: AuthService
+     * - Strategies: EmailPasswordStrategy, GoogleOAuthStrategy
+     * - Client: Este componente (auth-widget)
+     * El componente no necesita conocer los detalles de implementación de cada
+     * estrategia, solo usa la interfaz común proporcionada por AuthService.
+     */
     interface HTMLAuthWidgetElement extends Components.AuthWidget, HTMLStencilElement {
     }
     var HTMLAuthWidgetElement: {
@@ -29,6 +59,19 @@ declare global {
     }
 }
 declare namespace LocalJSX {
+    /**
+     * Componente de autenticación que implementa el patrón Strategy
+     * Este componente usa AuthService que actúa como Context del patrón Strategy,
+     * delegando las operaciones de autenticación a diferentes estrategias:
+     * - EmailPasswordStrategy: Para autenticación con email y contraseña
+     * - GoogleOAuthStrategy: Para autenticación con Google OAuth
+     * Patrón Strategy aplicado:
+     * - Context: AuthService
+     * - Strategies: EmailPasswordStrategy, GoogleOAuthStrategy
+     * - Client: Este componente (auth-widget)
+     * El componente no necesita conocer los detalles de implementación de cada
+     * estrategia, solo usa la interfaz común proporcionada por AuthService.
+     */
     interface AuthWidget {
         /**
           * @default '600px'
@@ -38,6 +81,10 @@ declare namespace LocalJSX {
           * @default 'bike.png'
          */
         "image"?: string;
+        /**
+          * @default 'http://localhost:5173'
+         */
+        "redirectAfterLogin"?: string;
     }
     interface IntrinsicElements {
         "auth-widget": AuthWidget;
@@ -47,6 +94,19 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            /**
+             * Componente de autenticación que implementa el patrón Strategy
+             * Este componente usa AuthService que actúa como Context del patrón Strategy,
+             * delegando las operaciones de autenticación a diferentes estrategias:
+             * - EmailPasswordStrategy: Para autenticación con email y contraseña
+             * - GoogleOAuthStrategy: Para autenticación con Google OAuth
+             * Patrón Strategy aplicado:
+             * - Context: AuthService
+             * - Strategies: EmailPasswordStrategy, GoogleOAuthStrategy
+             * - Client: Este componente (auth-widget)
+             * El componente no necesita conocer los detalles de implementación de cada
+             * estrategia, solo usa la interfaz común proporcionada por AuthService.
+             */
             "auth-widget": LocalJSX.AuthWidget & JSXBase.HTMLAttributes<HTMLAuthWidgetElement>;
         }
     }
